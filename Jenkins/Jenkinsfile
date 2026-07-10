@@ -21,10 +21,11 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                 dir('src/frontend') {
-                sh 'docker build -t onlineboutique-frontend:v1 .'
-        }
-    }
+        stage('Docker build') {
+           steps {
+                dir('src/frontend') {
+                 sh 'docker build -t onlineboutique-frontend:v1 .'
+              }
+           }
+       }
 }
