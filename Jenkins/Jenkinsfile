@@ -21,12 +21,10 @@ pipeline {
             }
         }
 
-        stage('Repository Structure') {
+        stage('Docker Build') {
             steps {
-                sh 'ls -ltr'
-                sh 'ls -ltr src/frontend'
-            }
+                 dir('src/frontend') {
+                sh 'docker build -t onlineboutique-frontend:v1 .'
         }
-
     }
 }
