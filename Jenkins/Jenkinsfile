@@ -1,12 +1,30 @@
 pipeline {
-    agent any
+    agent {
+        label 'docker'
+    }
 
     stages {
 
-        stage('Build Information') {
+        stage('Agent Verification') {
             steps {
+                sh 'hostname'
                 sh 'pwd'
+                sh 'whoami'
+            }
+        }
+
+        stage('Tool Verification') {
+            steps {
+                sh 'java -version'
+                sh 'git --version'
+                sh 'docker --version'
+            }
+        }
+
+        stage('Repository Structure') {
+            steps {
                 sh 'ls -ltr'
+                sh 'ls -ltr src/frontend'
             }
         }
 
