@@ -3,30 +3,43 @@ pipeline {
         label 'docker'
     }
 
+    environment {
+        IMAGE_NAME = "rajesh984/onlineboutique-frontend"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+    }
+
     stages {
 
-        stage('Agent Verification') {
+        stage('Build Image') {
             steps {
-                sh 'hostname'
-                sh 'pwd'
-                sh 'whoami'
-            }
-        }
-
-        stage('Tool Verification') {
-            steps {
-                sh 'java -version'
-                sh 'git --version'
-                sh 'docker --version'
-            }
-        }
-
-        stage('Docker build') {
-           steps {
                 dir('src/frontend') {
-                 sh 'docker build -t onlineboutique-frontend:v1 .'
-              }
-           }
-       }
+                    sh """
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+
+                    sh """
+                    echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+
+                    docker push "${IMAGE_NAME}:${IMAGE_TAG}"
+                    docker push "${IMAGE_NAME}:latest"
+                    """
+                }
+            }
+        }
+
     }
 }
