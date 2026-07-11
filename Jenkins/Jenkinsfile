@@ -1,45 +1,49 @@
 pipeline {
-    agent {
-        label 'docker'
-    }
+    agent 'docker'
 
     environment {
-        IMAGE_NAME = "rajesh984/onlineboutique-frontend"
-        IMAGE_TAG  = "${BUILD_NUMBER}"
+        DOCKERHUB_REPO = "rajesh984"
     }
 
     stages {
 
-        stage('Build Image') {
+        stage('Build Images') {
             steps {
-                dir('src/frontend') {
-                    sh """
-                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-                    """
+                sh '''
+                docker build -t $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER} src/frontend
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER} src/cartservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER} src/productcatalogservice
+                '''
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
                 }
             }
         }
 
-        stage('Push Image') {
+        stage('Push Images') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
+                sh '''
+                docker push $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER}
 
-                    sh """
-                    echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                docker push $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER}
 
-                    docker push "${IMAGE_NAME}:${IMAGE_TAG}"
-                    docker push "${IMAGE_NAME}:latest"
-                    """
-                }
+                docker push $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER}
+                '''
             }
         }
-
     }
+
 }
