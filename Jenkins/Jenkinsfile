@@ -21,7 +21,7 @@ pipeline {
                 sh '''
                 docker build -t $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER} src/frontend
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER} src/cartservice
+                docker build -t $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER} src/cartservice/src
 
                 docker build -t $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER} src/productcatalogservice
                 '''
