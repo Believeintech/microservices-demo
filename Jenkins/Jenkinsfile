@@ -54,4 +54,23 @@ pipeline {
             }
         }
     }
+        
+        stage('Deploy') {
+          steps {
+          sshagent(['minikube-ssh']) {
+
+            sh '''
+            ssh -o StrictHostKeyChecking=no ubuntu@10.x.x.x "
+
+            kubectl set image deployment/frontend \
+            server=rajesh984/onlineboutique-frontend:${BUILD_NUMBER}
+
+            kubectl rollout status deployment/frontend
+
+            "
+            '''
+        }
+    }
+  }
 }
+         
