@@ -1,11 +1,20 @@
 pipeline {
-    agent 'docker'
+    agent {
+        label 'docker'
+    }
 
     environment {
         DOCKERHUB_REPO = "rajesh984"
     }
 
     stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/<your-fork-repo>.git'
+            }
+        }
 
         stage('Build Images') {
             steps {
@@ -45,5 +54,4 @@ pipeline {
             }
         }
     }
-
 }
