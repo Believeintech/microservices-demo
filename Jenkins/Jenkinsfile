@@ -60,7 +60,7 @@ pipeline {
           sshagent(['minikube-ssh']) {
 
             sh '''
-            ssh -o StrictHostKeyChecking=no ubuntu@10.x.x.x "
+            ssh -o StrictHostKeyChecking=no ubuntu@172.31.36.144 "
 
             kubectl set image deployment/frontend \
             server=rajesh984/onlineboutique-frontend:${BUILD_NUMBER}
