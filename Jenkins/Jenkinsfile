@@ -46,25 +46,25 @@ pipeline {
         stage('Build Images') {
             steps {
                 sh '''
-                docker build -t $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER} src/frontend
+                docker build -t $DOCKERHUB_REPO/frontend:${BUILD_NUMBER} src/frontend
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER} src/cartservice/src
+                docker build -t $DOCKERHUB_REPO/cartservice:${BUILD_NUMBER} src/cartservice/src
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER} src/productcatalogservice
+                docker build -t $DOCKERHUB_REPO/productcatalogservice:${BUILD_NUMBER} src/productcatalogservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-currencyservice:${BUILD_NUMBER} src/currencyservice
+                docker build -t $DOCKERHUB_REPO/currencyservice:${BUILD_NUMBER} src/currencyservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-checkoutservice:${BUILD_NUMBER} src/checkoutservice
+                docker build -t $DOCKERHUB_REPO/checkoutservice:${BUILD_NUMBER} src/checkoutservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-emailservice:${BUILD_NUMBER} src/emailservice
+                docker build -t $DOCKERHUB_REPO/emailservice:${BUILD_NUMBER} src/emailservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-paymentservice:${BUILD_NUMBER} src/paymentservice
+                docker build -t $DOCKERHUB_REPO/paymentservice:${BUILD_NUMBER} src/paymentservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER} src/recommendationservice
+                docker build -t $DOCKERHUB_REPO/recommendationservice:${BUILD_NUMBER} src/recommendationservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER} src/shippingservice
+                docker build -t $DOCKERHUB_REPO/shippingservice:${BUILD_NUMBER} src/shippingservice
 
-                docker build -t $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER} src/adservice
+                docker build -t $DOCKERHUB_REPO/adservice:${BUILD_NUMBER} src/adservice
 
                 '''
             }
@@ -76,6 +76,15 @@ pipeline {
               trivy image \
               --severity HIGH,CRITICAL \
               $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-currencyservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-checkoutservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-emailservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-paymentservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER}
              '''
     }
 }
