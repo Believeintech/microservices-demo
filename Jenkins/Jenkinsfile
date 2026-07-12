@@ -24,6 +24,21 @@ pipeline {
                 docker build -t $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER} src/cartservice/src
 
                 docker build -t $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER} src/productcatalogservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-currencyservice:${BUILD_NUMBER} src/currencyservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-checkoutservice:${BUILD_NUMBER} src/checkoutservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-emailservice:${BUILD_NUMBER} src/emailservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-paymentservice:${BUILD_NUMBER} src/paymentservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER} src/recommendationservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER} src/shippingservice
+
+                docker build -t $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER} src/adservice
+
                 '''
             }
         }
@@ -50,6 +65,21 @@ pipeline {
                 docker push $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER}
 
                 docker push $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-currencyservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-checkoutservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-emailservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-paymentservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER}
+
+                docker push $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER}
+
                 '''
             }
         }
