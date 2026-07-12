@@ -123,67 +123,25 @@ pipeline {
                 docker push $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER}
 
                 docker push $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER}
-
                 docker push $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER}
 
                 '''
             }
         }
-        
-         stage('Deploy') {
-             steps {
-              sshagent(['minikube-ssh']) {
-                sh """
-                 ssh -o StrictHostKeyChecking=no ubuntu@172.31.36.144 '
-            
-                 kubectl set image deployment/frontend \
-                 server=rajesh984/onlineboutique-frontend:${BUILD_NUMBER}
 
-                 kubectl set image deployment/cartservice \
-                 server=rajesh984/onlineboutique-cartservice:${BUILD_NUMBER}
+        stage('Deploy') {
+            steps {
+             sshagent(['minikube-ssh']) {
+               sh """
+                ssh -o StrictHostKeyChecking=no ubuntu@172.31.36.144 '
+                cd /home/ubuntu/microservices-demo/helm-chart &&
 
-                 kubectl set image deployment/productcatalogservice \
-                 server=rajesh984/onlineboutique-productcatalogservice:${BUILD_NUMBER}
-
-                 kubectl set image deployment/currencyservice \
-                 server=rajesh984/onlineboutique-currencyservice:${BUILD_NUMBER}
- 
-                 kubectl set image deployment/checkoutservice \
-                    server=rajesh984/onlineboutique-checkoutservice:${BUILD_NUMBER}
-
-                kubectl set image deployment/emailservice \
-                    server=rajesh984/onlineboutique-emailservice:${BUILD_NUMBER}
-
-                kubectl set image deployment/paymentservice \
-                    server=rajesh984/onlineboutique-paymentservice:${BUILD_NUMBER}
-
-                kubectl set image deployment/recommendationservice \
-                    server=rajesh984/onlineboutique-recommendationservice:${BUILD_NUMBER}
-
-                kubectl set image deployment/shippingservice \
-                    server=rajesh984/onlineboutique-shippingservice:${BUILD_NUMBER}
-
-                kubectl set image deployment/adservice \
-                    server=rajesh984/onlineboutique-adservice:${BUILD_NUMBER}
-
-
-
-                 kubectl rollout status deployment/frontend
-                 kubectl rollout status deployment/cartservice
-                 kubectl rollout status deployment/productcatalogservice
-                 kubectl rollout status deployment/currencyservice
-                 kubectl rollout status deployment/checkoutservice
-                 kubectl rollout status deployment/emailservice
-                 kubectl rollout status deployment/paymentservice
-                 kubectl rollout status deployment/recommendationservice
-                 kubectl rollout status deployment/shippingservice
-                 kubectl rollout status deployment/adservice
-
-                 '
-            
-                """
-         }
-     }
-  }
+                helm upgrade --install onlineboutique . \
+                --set images.tag=${BUILD_NUMBER}
+            '
+            """
+        }
+    }
+}        
 }
-}
+
