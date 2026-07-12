@@ -70,6 +70,16 @@ pipeline {
             }
         }
 
+        stage('Trivy Scan') {
+           steps {
+              sh '''
+              trivy image \
+              --severity HIGH,CRITICAL \
+              $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER}
+             '''
+    }
+}
+
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
