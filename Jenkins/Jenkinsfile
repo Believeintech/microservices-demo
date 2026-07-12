@@ -93,7 +93,45 @@ pipeline {
                  kubectl set image deployment/frontend \
                  server=rajesh984/onlineboutique-frontend:${BUILD_NUMBER}
 
+                 kubectl set image deployment/cartservice \
+                 server=rajesh984/onlineboutique-cartservice:${BUILD_NUMBER}
+
+                 kubectl set image deployment/productcatalogservice \
+                 server=rajesh984/onlineboutique-productcatalogservice:${BUILD_NUMBER}
+
+                 kubectl set image deployment/currencyservice \
+                 server=rajesh984/onlineboutique-currencyservice:${BUILD_NUMBER}
+ 
+                 kubectl set image deployment/checkoutservice \
+                    server=rajesh984/onlineboutique-checkoutservice:${BUILD_NUMBER}
+
+                kubectl set image deployment/emailservice \
+                    server=rajesh984/onlineboutique-emailservice:${BUILD_NUMBER}
+
+                kubectl set image deployment/paymentservice \
+                    server=rajesh984/onlineboutique-paymentservice:${BUILD_NUMBER}
+
+                kubectl set image deployment/recommendationservice \
+                    server=rajesh984/onlineboutique-recommendationservice:${BUILD_NUMBER}
+
+                kubectl set image deployment/shippingservice \
+                    server=rajesh984/onlineboutique-shippingservice:${BUILD_NUMBER}
+
+                kubectl set image deployment/adservice \
+                    server=rajesh984/onlineboutique-adservice:${BUILD_NUMBER}
+
+
+
                  kubectl rollout status deployment/frontend
+                 kubectl rollout status deployment/cartservice
+                 kubectl rollout status deployment/productcatalogservice
+                 kubectl rollout status deployment/currencyservice
+                 kubectl rollout status deployment/checkoutservice
+                 kubectl rollout status deployment/emailservice
+                 kubectl rollout status deployment/paymentservice
+                 kubectl rollout status deployment/recommendationservice
+                 kubectl rollout status deployment/shippingservice
+                 kubectl rollout status deployment/adservice
 
                  '
             
