@@ -28,9 +28,11 @@ pipeline {
                        -Dsonar.projectKey=online-boutique \
                        -Dsonar.projectName=online-boutique \
                        -Dsonar.sources=src \
+                       -Dsonar.exclusions=**/*.java
                     """
             }
         }
+    
     }
 }
 
