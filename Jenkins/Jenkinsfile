@@ -75,16 +75,16 @@ pipeline {
               sh '''
               trivy image \
               --severity CRITICAL \
-              $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-currencyservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-checkoutservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-emailservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-paymentservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER}
-              $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/frontend:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/cartservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/productcatalogservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/currencyservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/checkoutservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/emailservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/paymentservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/recommendationservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/shippingservice:${BUILD_NUMBER}
+              $DOCKERHUB_REPO/adservice:${BUILD_NUMBER}
              '''
     }
 }
@@ -106,24 +106,24 @@ pipeline {
         stage('Push Images') {
             steps {
                 sh '''
-                docker push $DOCKERHUB_REPO/onlineboutique-frontend:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/frontend:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-cartservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/cartservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-productcatalogservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/productcatalogservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-currencyservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/currencyservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-checkoutservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/checkoutservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-emailservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/emailservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-paymentservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/paymentservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-recommendationservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/recommendationservice:${BUILD_NUMBER}
 
-                docker push $DOCKERHUB_REPO/onlineboutique-shippingservice:${BUILD_NUMBER}
-                docker push $DOCKERHUB_REPO/onlineboutique-adservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/shippingservice:${BUILD_NUMBER}
+                docker push $DOCKERHUB_REPO/adservice:${BUILD_NUMBER}
 
                 '''
             }
