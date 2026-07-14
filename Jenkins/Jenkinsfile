@@ -141,7 +141,7 @@ pipeline {
         }
     }
 }        
-}
+
         stage('Update Helm Values') {
            steps {
             sh '''
@@ -165,5 +165,6 @@ pipeline {
         }
     }
 }
+    }
 }
 
