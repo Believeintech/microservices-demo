@@ -142,17 +142,17 @@ pipeline {
     }
 }        
 }
-      stage('Update Helm Values') {
-    steps {
-        sh '''
-        sed -i 's/tag:.*/tag: "'${BUILD_NUMBER}'"/' helm-chart/values.yaml
-        '''
+        stage('Update Helm Values') {
+         steps {
+          sh '''
+          sed -i 's/tag:.*/tag: "'${BUILD_NUMBER}'"/' helm-chart/values.yaml
+          '''
 
-        withCredentials([usernamePassword(
+           withCredentials([usernamePassword(
             credentialsId: 'github-pat',
             usernameVariable: 'GIT_USER',
             passwordVariable: 'GIT_TOKEN'
-        )]) {
+          )]) {
             sh '''
             git config user.name "Jenkins"
             git config user.email "jenkins@local"
