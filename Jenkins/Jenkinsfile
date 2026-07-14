@@ -143,25 +143,25 @@ pipeline {
 }        
 }
         stage('Update Helm Values') {
-         steps {
-          sh '''
-          sed -i 's/tag:.*/tag: "'${BUILD_NUMBER}'"/' helm-chart/values.yaml
-          '''
-
-           withCredentials([usernamePassword(
-            credentialsId: 'github-pat',
-            usernameVariable: 'GIT_USER',
-            passwordVariable: 'GIT_TOKEN'
-          )]) {
+           steps {
             sh '''
-            git config user.name "Jenkins"
-            git config user.email "jenkins@local"
-
-            git add .
-            git commit -m "Update image tag ${BUILD_NUMBER}"
-
-            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/Believeintech/microservices-demo.git HEAD:main
+            sed -i 's/tag:.*/tag: "'${BUILD_NUMBER}'"/' helm-chart/values.yaml
             '''
+
+             withCredentials([usernamePassword(
+              credentialsId: 'github-pat',
+              usernameVariable: 'GIT_USER',
+              passwordVariable: 'GIT_TOKEN'
+            )]) {
+            sh '''
+             git config user.name "Jenkins"
+             git config user.email "jenkins@local"
+   
+             git add .
+             git commit -m "Update image tag ${BUILD_NUMBER}"
+  
+             git push https://${GIT_USER}:${GIT_TOKEN}@github.com/Believeintech/microservices-demo.git HEAD:main
+             '''
         }
     }
 }
