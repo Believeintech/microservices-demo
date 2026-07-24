@@ -3,6 +3,22 @@ pipeline {
         label 'docker'
     }
 
+    parameters {
+
+    string(
+        name: 'BRANCH_NAME',
+        defaultValue: 'main',
+        description: 'Git Branch to Build'
+    )
+
+    booleanParam(
+        name: 'DEPLOY',
+        defaultValue: true,
+        description: 'Deploy after Build'
+    )
+
+}
+
     environment {
         DOCKERHUB_REPO = "rajesh984"
     }
@@ -11,37 +27,58 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
+                git branch: "${BRANCH_NAME}",
                     url: 'https://github.com/Believeintech/microservices-demo.git'
             }
         }
 
-       // stage('SonarQube Analysis') {
-         //      steps {
-           //      script {       
-            //         def scannerHome = tool 'sonar-scanner'
+        stage('Display Parameters') {
 
-              //       withSonarQubeEnv('SonarQube') {
+    steps {
 
-                //     sh """
-                  //     ${scannerHome}/bin/sonar-scanner \
-                    //   -Dsonar.projectKey=online-boutique \
-                      // -Dsonar.projectName=online-boutique \
-                      // -Dsonar.sources=src \
-                       //-Dsonar.exclusions=**/*.java
-            //        """
-            //}
-        //}
+        script {
+
+            echo "================================="
+            echo "Pipeline Runtime Parameters"
+            echo "================================="
+
+            echo "Branch Name : ${params.BRANCH_NAME}"
+            echo "Environment : ${params.ENVIRONMENT}"
+            echo "Deploy Flag : ${params.DEPLOY}"
+
+            echo "================================="
+
+        }
+
+    }
+
+}
+
+        stage('SonarQube Analysis') {
+               steps {
+                 script {       
+                     def scannerHome = tool 'sonar-scanner'
+
+                     withSonarQubeEnv('SonarQube') {
+
+                     sh """
+                       ${scannerHome}/bin/sonar-scanner \
+                       -Dsonar.projectKey=online-boutique \
+                       -Dsonar.projectName=online-boutique \
+                       -Dsonar.sources=src \
+                       -Dsonar.exclusions=**/*.java
+                    """
+            }
     
-    //}
-//}     
-  //     stage('Quality Gate') {
-    //        steps {
-      //        timeout(time: 5, unit: 'MINUTES') {
-        //      waitForQualityGate abortPipeline: true
-          // }
-       //}
-//}
+    }
+}     
+       stage('Quality Gate') {
+            steps {
+              timeout(time: 5, unit: 'MINUTES') {
+              waitForQualityGate abortPipeline: true
+           }
+       }
+}
 
         stage('Build Images') {
             steps {
@@ -70,22 +107,22 @@ pipeline {
             }
         }
 
-  //      stage('Trivy Scan') {
-    //       steps {
-      //        sh '''
-        //      trivy image --severity CRITICAL  $DOCKERHUB_REPO/frontend:${BUILD_NUMBER}
-        //      trivy image --severity CRITICAL  $DOCKERHUB_REPO/cartservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/productcatalogservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/currencyservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/checkoutservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/emailservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/paymentservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/recommendationservice:${BUILD_NUMBER}
-         //     trivy image --severity CRITICAL  $DOCKERHUB_REPO/shippingservice:${BUILD_NUMBER}
-          //    trivy image --severity CRITICAL  $DOCKERHUB_REPO/adservice:${BUILD_NUMBER}
-           //  '''
-    //}
-//}
+        stage('Trivy Scan') {
+           steps {
+              sh '''
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/frontend:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/cartservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/productcatalogservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/currencyservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/checkoutservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/emailservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/paymentservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/recommendationservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/shippingservice:${BUILD_NUMBER}
+              trivy image --severity CRITICAL  $DOCKERHUB_REPO/adservice:${BUILD_NUMBER}
+             '''
+    }
+}
 
         stage('Docker Login') {
             steps {
@@ -128,6 +165,9 @@ pipeline {
         }
 
         stage('Deploy') {
+            when {
+                expression { return params.DEPLOY }
+            }
             steps {
              sshagent(['minikube-ssh']) {
                sh """
@@ -166,5 +206,7 @@ pipeline {
     }
 }
     }
+    }
 }
+
 
