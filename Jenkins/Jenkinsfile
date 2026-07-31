@@ -75,7 +75,7 @@ pipeline {
 }
        stage('Deploy') {
          steps {
-          deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'src/currencyservicez/k8s/deployment.yaml')
+          deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'cd kubernetes-manifests/currencyservice.yaml')
     }
 }
 
