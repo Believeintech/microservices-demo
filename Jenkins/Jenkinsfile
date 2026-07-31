@@ -60,7 +60,17 @@ pipeline {
         }
     }
 }
-  
+       stage('Deploy') {
+         steps {
+           withKubeConfig(credentialsId: 'kubeconfig-docker-desktop') {
+            sh '''
+              sed -i "s|image: currencyservice|image: rajesh984/currencyservice:${BUILD_NUMBER}|" kubernetes-manifests/currencyservice.yaml
+              kubectl apply -f kubernetes-manifests/currencyservice.yaml
+            '''
+        }
+    }
+}
+
         }
 
     
