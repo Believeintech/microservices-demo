@@ -7,8 +7,8 @@ pipeline {
                 sh 'ls -la'
             }
         }
-    }
-}
+
+
         stage('Prepare-Environment') {
              steps {
                 sh '''
@@ -18,5 +18,8 @@ pipeline {
                  node:20-alpine \
                  sh -c "node -v && npm -v && if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --legacy-peer-deps --no-audit --no-fund; fi"
                '''
+    }
+}
+
     }
 }
