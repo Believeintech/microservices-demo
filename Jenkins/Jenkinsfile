@@ -71,7 +71,7 @@ pipeline {
                  expression { params.ENVIRONMENT == 'prod' }
                 }
                 steps {
-                input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
+                   input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
     }
 }
        stage('Deploy') {
@@ -80,6 +80,7 @@ pipeline {
             sh '''
               sed -i "s|image: currencyservice|image: rajesh984/currencyservice:${BUILD_NUMBER}|" kubernetes-manifests/currencyservice.yaml
               kubectl apply -f kubernetes-manifests/currencyservice.yaml
+              kubectl rollout status deployment/currencyservice --timeout=60s
             '''
         }
     }
