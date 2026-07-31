@@ -21,6 +21,19 @@ pipeline {
              }
     }
 }
+       stage('Unit-Tests') {
+        steps {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh '''
+              docker run --rm \
+                -v jenkins_home:/var/jenkins_home \
+                -w ${WORKSPACE}/src/currencyservice \
+                node:20-alpine \
+                sh -c "npm test"
+            '''
+        }
+    }
+}
         
         stage('Build') {
             steps{
