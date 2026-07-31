@@ -22,7 +22,9 @@ pipeline {
         
         stage('Build') {
             steps{
-               sh 'docker build -t currencyservice:${BUILD_NUMBER} src/currencyservice'
+                retry(3) {
+                    sh 'docker build -t currencyservice:${BUILD_NUMBER} src/currencyservice'
+                }
             }
         }
 
