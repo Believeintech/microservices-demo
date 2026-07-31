@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev',  'prod'], description: 'Select the environment to deploy to')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -58,6 +63,15 @@ pipeline {
                  sh 'docker push rajesh984/currencyservice:${BUILD_NUMBER}'
             }
         }
+    }
+}
+
+       stage('Approval') {
+               when {
+                 expression { params.ENVIRONMENT == 'prod' }
+                }
+                steps {
+                input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
     }
 }
        stage('Deploy') {
