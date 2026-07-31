@@ -86,16 +86,16 @@ pipeline {
     }
 }
     post {
-    success {
+      success {
         echo "Pipeline succeeded — currencyservice:${BUILD_NUMBER} deployed to ${params.ENVIRONMENT}"
     }
-    unstable {
+      unstable {
         echo "Pipeline finished UNSTABLE — check Unit-Tests / security-scan findings for currencyservice:${BUILD_NUMBER}"
     }
-    failure {
+      failure {
         echo "Pipeline FAILED for currencyservice:${BUILD_NUMBER} — check console output"
     }
-    always {
+      always {
         echo "Pipeline finished with result: ${currentBuild.result}"
     }
 }
