@@ -85,7 +85,8 @@ pipeline {
         }
     }
 }
-    post {
+    }
+ post {
       success {
         echo "Pipeline succeeded — currencyservice:${BUILD_NUMBER} deployed to ${params.ENVIRONMENT}"
     }
@@ -99,8 +100,4 @@ pipeline {
         echo "Pipeline finished with result: ${currentBuild.result}"
     }
 }
-
-        }
-
-    
-}
+    }
