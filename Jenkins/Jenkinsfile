@@ -63,7 +63,7 @@ pipeline {
                }
              }
     }
-}
+
 
        stage('Approval') {
                when {
@@ -78,6 +78,7 @@ pipeline {
           deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-creds', 'src/currencyservicez/k8s/deployment.yaml')
     }
 }
+
     }
  post {
       success {
@@ -93,4 +94,6 @@ pipeline {
         echo "Pipeline finished with result: ${currentBuild.result}"
     }
 }
-    }
+
+}
+    
