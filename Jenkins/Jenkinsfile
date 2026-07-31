@@ -1,3 +1,4 @@
+library 'reference-pipeline'
 pipeline {
     agent any
 
@@ -43,7 +44,7 @@ pipeline {
         stage('Build') {
             steps{
                 retry(3) {
-                    sh 'docker build -t currencyservice:${BUILD_NUMBER} src/currencyservice'
+                    buildDockerImage('currencyservice', env.BUILD_NUMBER)
                 }
             }
         }
