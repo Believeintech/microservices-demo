@@ -19,6 +19,12 @@ pipeline {
                  '''
     }
 }
+        
+        stage('Build') {
+            steps{
+               sh 'docker build -t currencyservice:${BUILD_NUMBER} src/currencyservice'
+            }
+        }
 
     }
 }
