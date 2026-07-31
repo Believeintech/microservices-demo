@@ -52,18 +52,16 @@ pipeline {
         stage('security-scan') {
                 steps {
                  catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                 sh 'trivy image --severity CRITICAL --exit-code 1 currencyservice:${BUILD_NUMBER}'
+                 trivyScan('currencyservice', env.BUILD_NUMBER)
                  }
     }
 }
         stage('Push') {
              steps {
                script {
-                 docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
-                 sh 'docker tag currencyservice:${BUILD_NUMBER} rajesh984/currencyservice:${BUILD_NUMBER}'
-                 sh 'docker push rajesh984/currencyservice:${BUILD_NUMBER}'
-            }
-        }
+                 pushToDockerHub('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'dockerhub-creds')
+               }
+             }
     }
 }
 
@@ -77,13 +75,7 @@ pipeline {
 }
        stage('Deploy') {
          steps {
-           withKubeConfig(credentialsId: 'kubeconfig-docker-desktop') {
-            sh '''
-              sed -i "s|image: currencyservice|image: rajesh984/currencyservice:${BUILD_NUMBER}|" kubernetes-manifests/currencyservice.yaml
-              kubectl apply -f kubernetes-manifests/currencyservice.yaml
-              kubectl rollout status deployment/currencyservice --timeout=60s
-            '''
-        }
+          deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-creds', 'src/currencyservicez/k8s/deployment.yaml')
     }
 }
     }
