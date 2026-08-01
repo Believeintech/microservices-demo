@@ -81,7 +81,7 @@ pipeline {
           steps {
              input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
     }
-}
+       }
        stage('Deploy') {
          steps {
            deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/currencyservice.yaml')
