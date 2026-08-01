@@ -87,8 +87,6 @@ pipeline {
 
     }
     
-
-}
     
     post {
       success {
@@ -105,3 +103,6 @@ pipeline {
         echo "Pipeline finished with result: ${currentBuild.result}"
     }
 }
+
+}
+
