@@ -86,7 +86,7 @@ pipeline {
 }
 
     }
- post {
+    post {
       build job: 'post-deploy-notify', wait: false
 }
 
