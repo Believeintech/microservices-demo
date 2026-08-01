@@ -76,7 +76,7 @@ pipeline {
                  expression { params.ENVIRONMENT == 'prod' }
                 }
                 steps {
-                   input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
+                   input message: "Approve deployment of currencyservice to PRODUCTION ?", ok: "Deploy"
     }
 }
        stage('Deploy') {
