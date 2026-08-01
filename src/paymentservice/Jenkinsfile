@@ -1,0 +1,91 @@
+library 'reference-pipeline'
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev',  'prod'], description: 'Select the environment to deploy to')
+    }
+
+    options {
+       buildDiscarder(logRotator(numToKeepStr: '10'))
+       timeout(time: 30, unit: 'MINUTES')
+       disableConcurrentBuilds()
+}
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checkout stage running from SCM-sourced Jenkinsfile"
+                sh 'ls -la'
+            }
+        }
+
+        stage('Prepare-Environment') {
+           steps {
+             retry(2) {
+               prepareNodeEnv('currencyservice') 
+             }
+    }
+}
+       stage('Unit-Tests') {
+        steps {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+            sh '''
+              docker run --rm \
+                -v jenkins_home:/var/jenkins_home \
+                -w ${WORKSPACE}/src/currencyservice \
+                node:20-alpine \
+                sh -c "npm test"
+            '''
+        }
+    }
+}
+        
+        stage('Build') {
+            steps{
+                retry(3) {
+                    buildDockerImage('currencyservice', env.BUILD_NUMBER)
+                }
+            }
+        }
+
+        stage('security-scan') {
+                steps {
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                 trivyScan('currencyservice', env.BUILD_NUMBER)
+                 }
+    }
+}
+        stage('Push') {
+             steps {
+               script {
+                 pushToDockerHub('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'dockerhub-creds')
+               }
+             }
+    }
+
+
+       stage('Approval') {
+          when {
+           anyOf {
+            expression { params.ENVIRONMENT == 'prod' }
+            branch 'main'
+        }
+    }
+          steps {
+             input message: "Approve deployment of currencyservice to PRODUCTION from main branch?", ok: "Deploy"
+    }
+       }
+       stage('Deploy') {
+         steps {
+           deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/currencyservice.yaml')
+    }
+}
+
+    }
+ post {
+      build job: 'post-deploy-notify', wait: false
+}
+
+}
+    
