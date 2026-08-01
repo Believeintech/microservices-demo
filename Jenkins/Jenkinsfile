@@ -87,18 +87,7 @@ pipeline {
 
     }
  post {
-      success {
-        echo "Pipeline succeeded — currencyservice:${BUILD_NUMBER} deployed to ${params.ENVIRONMENT}"
-    }
-      unstable {
-        echo "Pipeline finished UNSTABLE — check Unit-Tests / security-scan findings for currencyservice:${BUILD_NUMBER}"
-    }
-      failure {
-        echo "Pipeline FAILED for currencyservice:${BUILD_NUMBER} — check console output"
-    }
-      always {
-        echo "Pipeline finished with result: ${currentBuild.result}"
-    }
+      build job: 'post-deploy-notify', wait: false
 }
 
 }
