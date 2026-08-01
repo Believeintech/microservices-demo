@@ -1,0 +1,92 @@
+library 'reference-pipeline'
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'prod'], description: 'Select the environment to deploy to')
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checkout stage running from SCM-sourced Jenkinsfile"
+                sh 'ls -la'
+            }
+        }
+
+        stage('Unit-Tests') {
+            steps {
+                sh '''
+                  docker run --rm \
+                    -v jenkins_home:/var/jenkins_home \
+                    -w ${WORKSPACE}/src/productcatalogservice \
+                    golang:1.26-alpine \
+                    sh -c "go test ./..."
+                '''
+            }
+        }
+
+        stage('Build') {
+            steps {
+                retry(2) {
+                    buildDockerImage('productcatalogservice', env.BUILD_NUMBER)
+                }
+            }
+        }
+
+        stage('security-scan') {
+            steps {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                    trivyScan('productcatalogservice', env.BUILD_NUMBER)
+                }
+            }
+        }
+
+        stage('Push') {
+            steps {
+                script {
+                    pushToDockerHub('rajesh984', 'productcatalogservice', env.BUILD_NUMBER, 'dockerhub-creds')
+                }
+            }
+        }
+
+        stage('Approval') {
+            when {
+                anyOf {
+                    expression { params.ENVIRONMENT == 'prod' }
+                    branch 'main'
+                }
+            }
+            steps {
+                input message: "Approve deployment of productcatalogservice to PRODUCTION?", ok: "Deploy"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                deployToK8s('rajesh984', 'productcatalogservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/productcatalogservice.yaml')
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline succeeded — productcatalogservice:${BUILD_NUMBER} deployed to ${params.ENVIRONMENT}"
+        }
+        unstable {
+            echo "Pipeline finished UNSTABLE — check security-scan findings for productcatalogservice:${BUILD_NUMBER}"
+        }
+        failure {
+            echo "Pipeline FAILED for productcatalogservice:${BUILD_NUMBER} — check console output, likely Unit-Tests since it's a hard gate"
+        }
+        always {
+            echo "Pipeline finished with result: ${currentBuild.result}"
+        }
+    }
+}
