@@ -72,11 +72,14 @@ pipeline {
 
 
        stage('Approval') {
-               when {
-                 expression { params.ENVIRONMENT == 'prod' }
-                }
-                steps {
-                   input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
+          when {
+           anyOf {
+            expression { params.ENVIRONMENT == 'prod' }
+            branch 'main'
+        }
+    }
+          steps {
+             input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
     }
 }
        stage('Deploy') {
