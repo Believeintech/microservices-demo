@@ -79,7 +79,7 @@ pipeline {
         }
     }
           steps {
-             input message: "Approve deployment of currencyservice to PRODUCTION?", ok: "Deploy"
+             input message: "Approve deployment of currencyservice to PRODUCTION from main branch?", ok: "Deploy"
     }
        }
        stage('Deploy') {
