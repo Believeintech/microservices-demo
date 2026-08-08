@@ -3,14 +3,14 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ENVIRONMENT', choices: ['dev',  'prod'], description: 'Select the environment to deploy to')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'prod'], description: 'Select the environment to deploy to')
     }
 
     options {
-       buildDiscarder(logRotator(numToKeepStr: '10'))
-       timeout(time: 30, unit: 'MINUTES')
-       disableConcurrentBuilds()
-}
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
 
     stages {
         stage('Checkout') {
@@ -21,71 +21,83 @@ pipeline {
         }
 
         stage('Prepare-Environment') {
-           steps {
-             retry(2) {
-               prepareNodeEnv('currencyservice') 
-             }
-    }
-}
-       stage('Unit-Tests') {
-        steps {
-          catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-            sh '''
-              docker run --rm \
-                -v jenkins_home:/var/jenkins_home \
-                -w ${WORKSPACE}/src/currencyservice \
-                node:20-alpine \
-                sh -c "npm test"
-            '''
+            steps {
+                retry(2) {
+                    prepareNodeEnv('paymentservice')
+                }
+            }
         }
-    }
-}
-        
+
+        stage('Unit-Tests') {
+            steps {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                    sh '''
+                      docker run --rm \
+                        -v jenkins_home:/var/jenkins_home \
+                        -w ${WORKSPACE}/src/paymentservice \
+                        node:20-alpine \
+                        sh -c "npm test"
+                    '''
+                }
+            }
+        }
+
         stage('Build') {
-            steps{
+            steps {
                 retry(3) {
-                    buildDockerImage('currencyservice', env.BUILD_NUMBER)
+                    buildDockerImage('paymentservice', env.BUILD_NUMBER)
                 }
             }
         }
 
         stage('security-scan') {
-                steps {
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                 trivyScan('currencyservice', env.BUILD_NUMBER)
-                 }
-    }
-}
+            steps {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                    trivyScan('paymentservice', env.BUILD_NUMBER)
+                }
+            }
+        }
+
         stage('Push') {
-             steps {
-               script {
-                 pushToDockerHub('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'dockerhub-creds')
-               }
-             }
-    }
+            steps {
+                script {
+                    pushToDockerHub('rajesh984', 'paymentservice', env.BUILD_NUMBER, 'dockerhub-creds')
+                }
+            }
+        }
 
+        stage('Approval') {
+            when {
+                anyOf {
+                    expression { params.ENVIRONMENT == 'prod' }
+                    branch 'main'
+                }
+            }
+            steps {
+                input message: "Approve deployment of paymentservice to PRODUCTION from main branch?", ok: "Deploy"
+            }
+        }
 
-       stage('Approval') {
-          when {
-           anyOf {
-            expression { params.ENVIRONMENT == 'prod' }
-            branch 'main'
+        stage('Deploy') {
+            steps {
+                deployToK8s('rajesh984', 'paymentservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/paymentservice.yaml')
+            }
         }
     }
-          steps {
-             input message: "Approve deployment of currencyservice to PRODUCTION from main branch?", ok: "Deploy"
-    }
-       }
-       stage('Deploy') {
-         steps {
-           deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/currencyservice.yaml')
-    }
-}
 
+    post {
+        success {
+            echo "Pipeline succeeded — paymentservice:${BUILD_NUMBER} deployed to ${params.ENVIRONMENT}"
+            build job: 'post-deploy-notify', wait: false
+        }
+        unstable {
+            echo "Pipeline finished UNSTABLE — check Unit-Tests / security-scan findings for paymentservice:${BUILD_NUMBER}"
+        }
+        failure {
+            echo "Pipeline FAILED for paymentservice:${BUILD_NUMBER} — check console output"
+        }
+        always {
+            echo "Pipeline finished with result: ${currentBuild.result}"
+        }
     }
- post {
-      build job: 'post-deploy-notify', wait: false
 }
-
-}
-    
