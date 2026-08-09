@@ -20,6 +20,18 @@ pipeline {
             }
         }
 
+      stage('Check Skip CI') {
+        steps {
+          script {
+            def lastCommitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+            if (lastCommitMsg.contains('[skip ci]')) {
+                currentBuild.result = 'NOT_BUILT'
+                error("Skipping build — last commit marked [skip ci]")
+            }
+        }
+    }
+}
+
         stage('Prepare-Environment') {
             steps {
                 retry(2) {
