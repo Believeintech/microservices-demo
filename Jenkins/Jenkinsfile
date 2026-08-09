@@ -92,8 +92,10 @@ pipeline {
     }
 }
        stage('Deploy') {
-         steps {
-           deployToK8s('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/currencyservice.yaml')
+    steps {
+        script {
+            updateManifestInGit('rajesh984', 'currencyservice', env.BUILD_NUMBER, 'kubernetes-manifests/currencyservice.yaml', 'github-creds')
+        }
     }
 }
 
