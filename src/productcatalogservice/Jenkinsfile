@@ -80,9 +80,11 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                deployToK8s('rajesh984', 'productcatalogservice', env.BUILD_NUMBER, 'kubeconfig-docker-desktop', 'kubernetes-manifests/productcatalogservice.yaml')
-            }
+             steps {
+               script {
+            updateManifestInGit('rajesh984', 'productcatalogservice', env.BUILD_NUMBER, 'kubernetes-manifests/productcatalogservice.yaml', 'github-creds')
+        }
+    }
         }
     }
 
