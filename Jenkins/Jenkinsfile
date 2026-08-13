@@ -1,4 +1,4 @@
-// trigger: testing ArgoCD automated sync
+// trigger: testing isolated-clone GitOps push to new manifests repo
 library 'reference-pipeline'
 pipeline {
     agent any
